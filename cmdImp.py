@@ -17,7 +17,7 @@ pHeight = device.getProperty("display.height")
 print "device width:" + str(pWidth) + ", Height:" + str(pHeight) + ", Density:" + str(device.getProperty("display.density"))
 
 cnt = 0
-fn = "d:\\"
+fn = "./"
 while 1:
     startTick = time.time()
     print "Start take snapshot for count:" + str(cnt)
@@ -25,15 +25,15 @@ while 1:
     endTick = time.time()
     print "End take snapshot for count:" + str(cnt) + ", Elapse secs:" + str(endTick-startTick)
     # Writes the screenshot to a file
-    fn = "d:\\s" + str(cnt) + ".png"
+    fn = "./snapshots/s" + str(cnt) + ".png"
     startTick = time.time()
     print "Start write to file :" + fn
     screenShot.writeToFile(fn,'png')
     endTick = time.time()
     print "Ended write to file, Elapse secs:" + str(endTick-startTick)
-
+ 
     # external template Matching
-    process = subprocess.Popen(['python','d:\\Projects\\mrTest\\cv.py','d:\\Projects\\mrTest\\tpl.png',fn],stdout=subprocess.PIPE)
+    process = subprocess.Popen(['python','./cv.py','./tpl.png',fn],stdout=subprocess.PIPE)
     print process.communicate()
 
     cnt += 1

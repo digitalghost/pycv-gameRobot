@@ -24,7 +24,7 @@ img2 = img.copy()
 template = cv2.imread(sys.argv[1],0)
 w, h = template.shape[::-1]
 
-method = cv2.TM_CCOEFF
+method = cv2.TM_CCOEFF_NORMED
 # All the 6 methods for comparison in a list
 #methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
 #            'cv2.TM_CCORR_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']

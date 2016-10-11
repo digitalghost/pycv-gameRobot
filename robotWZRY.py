@@ -14,7 +14,6 @@ autopath = {
         {"features":["tpl8.png"],"touches":["tch8.png"]},
         {"features":["tpl9.png"],"touches":["tch9.png"]},
         {"features":["tpl10.png"],"touches":["tch10.png"]}
-        
     ]
 
 }
@@ -30,6 +29,10 @@ device.wake()
 pWidth = device.getProperty("display.width")
 pHeight = device.getProperty("display.height")
 print "***PHONE INFO*** device width:" + str(pWidth) + ", Height:" + str(pHeight) + ", Density:" + str(device.getProperty("display.density"))
+
+defaultDensity = 3.5
+currentDensity = float(device.getProperty("display.density"));
+scaleFactor = currentDensity/defaultDensity
 
 cnt = 0
 fn = "./"
@@ -47,7 +50,7 @@ while 1:
     screenShot.writeToFile(fn,'png')
     endTick = time.time()
     #print "Ended write to file, Elapse secs:" + str(endTick-startTick)
-    print "***WRITE FILE DONE*** Elapse in secs:" + str(endTick-startTick)
+    print "***WRITE FILE DONE*** File: " + fn + " Elapse in secs:" + str(endTick-startTick)
 
     #start loop for autopath
     for sceneName, steps in autopath.iteritems():
@@ -60,23 +63,23 @@ while 1:
                     # Mathing the feature
                     tplPath = './templates/' + sceneName + '/' + feature
                     print "***FEATURE %s MATCHING***........Template Path is %s" %(feature,tplPath)
-                    process = subprocess.Popen(['python','./cvTplMatch.py',tplPath,fn],stdout=subprocess.PIPE)
+                    process = subprocess.Popen(['python','./cvTplMatchScale.py',tplPath,fn,str(scaleFactor)],stdout=subprocess.PIPE)
                     cmdData = process.communicate()[0]
                     cmdStr = str(cmdData)[:-1]
                     cmdRC = process.returncode
                     if str(cmdStr) == "NULL":
-                        print "***FEATURE MATCHING MISSED***" 
+                        print "***FEATURE MATCHING MISSED***"
                         featuresFounded = False
                         break
                     else:
-                        print "***FEATURE MATCHING SUCCEED***" 
+                        print "***FEATURE MATCHING SUCCEED***"
                         featuresFounded = True
-            # Start to touches when features founded 
+            # Start to touches when features founded
             if featuresFounded:
                 for idx, touch in enumerate(step["touches"]):
-                        touchPath = './templates/' + sceneName + '/' + touch 
+                        touchPath = './templates/' + sceneName + '/' + touch
                         print "***TOUCH %s MATCHING***........Touch Path is %s" %(touch,touchPath)
-                        process = subprocess.Popen(['python','./cvTplMatch.py',touchPath,fn],stdout=subprocess.PIPE)
+                        process = subprocess.Popen(['python','./cvTplMatchScale.py',touchPath,fn,str(scaleFactor)],stdout=subprocess.PIPE)
                         cmdData = process.communicate()[0]
                         cmdStr = str(cmdData)[:-1]
                         cmdRC = process.returncode
@@ -84,13 +87,12 @@ while 1:
                             print "---FEATURE FOUNDED, BUT TOUCH %s NOT FOUNDED, CHECK YOUR TEMPLATE CONFIGURATION---" %touch
                         else:
                             arr = cmdStr.split(",")
+                            print "cmd return:" + cmdStr
                             centerX = int(int(arr[0]) + (int(arr[2]) - int(arr[0]))/2)
                             centerY = int(int(arr[1]) + (int(arr[3]) - int(arr[1]))/2)
                             print "***FEATURE FOUNDED*** Start to touch at %s" %touch
                             device.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
-        
-                break 
-    
+                break
     cnt += 1
     if cnt == 10:
         cnt = 0

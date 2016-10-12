@@ -27,7 +27,7 @@ autopath = {
         {"features":["tpl7_1.png","tpl7_2.png"],"touches":["tch7.png"],"method":"proc_autovsnpc_for_tpl7"},
         {"features":["tpl8_1.png"],"touches":["tch8.png"]},
         {"features":["tpl9.png"],"touches":["tch9.png"]},
-        {"features":["tpl10_1.png","tpl10_2.png"],"touches":["tch10.png","tch10_1.png","tch10_2.png"],"method":"proc_autovsnpc_for_tpl10"},
+        {"features":["tpl10_1.png","tpl10_2.png"],"touches":["tch10.png","tch10_1.png","tch10_2.png"],"method":"proc_autovsnpc_for_tpl10","method_repeats":5},
 
     ]
 }
@@ -44,13 +44,13 @@ def proc_autovsnpc_for_tpl10(data):
     _moveXVal = _joyX
     _moveYVal = _moveXVal
     #print "joyX:%s,joyY:%s,ScreenHeight:%s" %(str(_joyX),str(_joyY),str(SCREEN_HEIGHT))
-    _random = random.randint(0,2)
+    _random = random.randint(0,5)
     if _random == 0:
         _moveXVal = 0
     elif _random == 1:
-        _moveXVal = _moveXVal
+        _moveXVal = 0-_moveXVal
     else:
-        _moveXVal = 0 - _moveXVal
+        _moveXVal = _moveXVal
     _random = random.randint(0,2)
     if _random == 0:
         _moveYVal = 0
@@ -65,16 +65,17 @@ def proc_autovsnpc_for_tpl10(data):
         else:
             _moveYVal = _joyX
     _target = (_joyX+_moveXVal,_joyY+_moveYVal)
-    print "Drag joy 5 times, from point: %s,%s  to target point: %s,%s" %(str(_joyX),str(_joyY),str(_target[0]),str(_target[1]))
+    _rpts = random.randint(3,10)
+    print "Drag joy %s times, from point: %s,%s  to target point: %s,%s" %(str(_rpts),str(_joyX),str(_joyY),str(_target[0]),str(_target[1]))
     # Check if able to touch the "Attack" button
-    touchPath = './templates/' + SCENE_NAME + '/' + touches[0] 
+    touchPath = './templates/' + SCENE_NAME + '/' + touches[0]
     print "Matching touch path for attack button  %s" %touchPath
     exists,region = _checkTemplateExists(touchPath,LATEST_SCREENSHOT_PATH)
     centerX = centerY = 0
     if exists:
         centerX = region[0] + (region[2] - region[0])/2
         centerY = region[1] + (region[3] - region[1])/2
-    for idx in range(5):
+    for idx in range(_rpts):
         device.drag((_joyX,_joyY),_target , 2, 10)
         if exists:
             print "Attack button founded, Start to attack" 
@@ -222,7 +223,11 @@ while 1:
                 print "***EXECUTING METHOD FOR %s MATCHING***........data is %s" %(step["method"],str(step))
                 #print "eval string:" + step["method"] + "(" + str(step) + ")"
                 code = step["method"] + "(" + str(step) + ")"
-                exec code
+                if step.has_key("method_repeats"):
+                    for idx in range(step["method_repeats"]):
+                        exec code
+                else:
+                    exec code
             else:
                 for idx, touch in enumerate(step["touches"]):
                     touchPath = './templates/' + SCENE_NAME + '/' + touch 

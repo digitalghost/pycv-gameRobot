@@ -15,7 +15,7 @@ device.wake()
 pWidth = device.getProperty("display.width")
 pHeight = device.getProperty("display.height")
 print "device width:" + str(pWidth) + ", Height:" + str(pHeight) + ", Density:" + str(device.getProperty("display.density"))
-
+print "device name :" +str(device.getProperty("build.product"))+ str(device.getProperty("build.device"))
 cnt = 0
 fn = "./"
 while 1:

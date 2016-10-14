@@ -5,6 +5,11 @@ import random
 # Imports the monkeyrunner modules used by this program
 from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice
 
+supportedDevices = [
+    {"pName":"HUAWEI P9","iName":"EVA-AL10___HWEVA"},
+    {"pName":"Le Max2","iName":"LeMax2_CN___le_x2"},
+]
+
 autopath = {
     "auto_coin":[
         {"features":["tpl1.png"],"touches":["tch1.png"]},
@@ -27,7 +32,7 @@ autopath = {
         {"features":["tpl7_1.png","tpl7_2.png"],"touches":["tch7.png"],"method":"proc_autovsnpc_for_tpl7"},
         {"features":["tpl8_1.png"],"touches":["tch8.png"]},
         {"features":["tpl9.png"],"touches":["tch9.png"]},
-        {"features":["tpl10_1.png","tpl10_2.png"],"touches":["tch10.png","tch10_1.png","tch10_2.png"],"method":"proc_autovsnpc_for_tpl10","method_repeats":5},
+        {"features":["tpl10_1.png","tpl10_2.png"],"touches":["tch10.png","tch10_1.png","tch10_2.png"],"method":"proc_autovsnpc_for_tpl10","method_repeats":2},
 
     ]
 }
@@ -68,7 +73,7 @@ def proc_autovsnpc_for_tpl10(data):
     _rpts = random.randint(3,10)
     print "Drag joy %s times, from point: %s,%s  to target point: %s,%s" %(str(_rpts),str(_joyX),str(_joyY),str(_target[0]),str(_target[1]))
     # Check if able to touch the "Attack" button
-    touchPath = './templates/' + SCENE_NAME + '/' + touches[0]
+    touchPath = touches[0]
     print "Matching touch path for attack button  %s" %touchPath
     exists,region = _checkTemplateExists(touchPath,LATEST_SCREENSHOT_PATH)
     centerX = centerY = 0
@@ -87,7 +92,7 @@ def proc_autovsnpc_for_tpl10(data):
     device.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
 
     # To buy the item
-    touchPath = './templates/' + SCENE_NAME + '/' + features[0] 
+    touchPath = features[0] 
     exists,region = _checkTemplateExists(touchPath,LATEST_SCREENSHOT_PATH)
     if exists:
         centerX = region[0] + (region[2] - region[0])/2 + (region[2] - region[0])*2
@@ -99,7 +104,7 @@ def proc_autovsnpc_for_tpl10(data):
 
     # Upgrade skill level
     for val in [1,2]: 
-        touchPath = './templates/' + SCENE_NAME + '/' + touches[val] 
+        touchPath = touches[val] 
         exists,region = _checkTemplateExists(touchPath,LATEST_SCREENSHOT_PATH)
         if exists:
             centerX = region[0] + (region[2] - region[0])/2
@@ -119,7 +124,7 @@ def proc_autovsnpc_for_tpl7(data):
     touches = data["touches"]
     print "***ENTER SUB PROC proc_autovsnpc_for_tpl7***" 
     # Check if able to touch the "Confirm" button
-    touchPath = './templates/' + SCENE_NAME + '/' + touches[0] 
+    touchPath = touches[0] 
     print "Matching touch path for confirm button  %s" %touchPath
     exists,region = _checkTemplateExists(touchPath,LATEST_SCREENSHOT_PATH)
     if exists:
@@ -130,7 +135,7 @@ def proc_autovsnpc_for_tpl7(data):
         device.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
     else:
         print "Confirm button not founded"
-    featurePath = './templates/' + SCENE_NAME + '/' + features[0] 
+    featurePath = features[0] 
     exists,region = _checkTemplateExists(featurePath,LATEST_SCREENSHOT_PATH)
     if exists:
         _leftX = 0
@@ -150,6 +155,7 @@ def proc_autovsnpc_for_tpl2(data):
     print "IN Method proc_autovsnpc_for_tpl2,data is: " + str(data)
 
 def _checkTemplateExists(tplPath,snapshot):
+    tplPath = './templates/' + DEVICE_FULLNAME + "/" + SCENE_NAME + '/' + tplPath
     process = subprocess.Popen(['python','./cvTplMatch.py',tplPath,snapshot],stdout=subprocess.PIPE)
     cmdData = process.communicate()[0]
     cmdStr = str(cmdData)[:-1]
@@ -165,7 +171,8 @@ def _checkTemplateExists(tplPath,snapshot):
 
 print sys.argv
 if len(sys.argv)<int(2) :
-    sys.exit("Not enough arguments. cmd format is: monkeyrunner scriptname scenename")
+    print "Not enough arguments. cmd format is: monkeyrunner scriptname scenename"
+    sys.exit(0)
 SCENE_NAME = sys.argv[1];
 
 # Kill monkey process for stop the exception for socket error
@@ -178,7 +185,18 @@ device.wake()
 # Screen properties for the device
 SCREEN_WIDTH = int(device.getProperty("display.width"))
 SCREEN_HEIGHT = int(device.getProperty("display.height"))
-print "***PHONE INFO*** device width:" + str(SCREEN_WIDTH) + ", Height:" + str(SCREEN_HEIGHT) + ", Density:" + str(device.getProperty("display.density"))
+DEVICE_FULLNAME = str(device.getProperty("build.product")) + "___" + str(device.getProperty("build.device"))
+print "***PHONE INFO*** device width:" + str(SCREEN_WIDTH) + ", Height:" + str(SCREEN_HEIGHT) + ", Density:" + str(device.getProperty("display.density") + ", DeviceName:" + DEVICE_FULLNAME)
+
+# Check if device supported
+_supported = False
+for _device in supportedDevices:
+    if _device["iName"] == DEVICE_FULLNAME:
+        _supported = True
+        break
+if _supported == False:
+    print "Your device " + DEVICE_FULLNAME + " not supported in current version, plz contact me"
+    sys.exit(0)
 
 cnt = 0
 LATEST_SCREENSHOT_PATH = "./"
@@ -207,7 +225,7 @@ while 1:
         for idx, feature in enumerate(step["features"]):
                 #print(idx, val)
                 # Mathing the feature
-                tplPath = './templates/' + SCENE_NAME + '/' + feature
+                tplPath = feature
                 print "***FEATURE %s MATCHING***........Template Path is %s" %(feature,tplPath)
                 exists,region = _checkTemplateExists(tplPath,LATEST_SCREENSHOT_PATH)
                 if exists:
@@ -230,7 +248,7 @@ while 1:
                     exec code
             else:
                 for idx, touch in enumerate(step["touches"]):
-                    touchPath = './templates/' + SCENE_NAME + '/' + touch 
+                    touchPath = touch
                     print "***TOUCH %s MATCHING***........Touch Path is %s" %(touch,touchPath)
                     exists,region = _checkTemplateExists(touchPath,LATEST_SCREENSHOT_PATH)
                     if exists:

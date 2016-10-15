@@ -40,15 +40,14 @@ resCode = "0" #0,1,3
 for res in result:
     resCode = res
 
+_degree = float(sys.argv[2])
 orgImg = cv2.imread(sys.argv[1],0)
-cv2.imwrite(sys.argv[1]+"1.png",orgImg)
 orgImg2 = orgImg.copy()
-#resultImg = _rotateImage2(orgImg,90)
-resultImg = _rotateAndScale(orgImg,1.0,90)
+resultImg = _rotateAndScale(orgImg,1.0,_degree)
 if resCode == "1":
-    resultImg = _rotateAndScale(orgImg,1.0,90)
+    resultImg = _rotateAndScale(orgImg,1.0,_degree)
 elif resCode == "3":
-    resultImg = _rotateAndScale(orgImg,1.0,270)
+    resultImg = _rotateAndScale(orgImg,1.0,_degree)
 cv2.imwrite(sys.argv[1],resultImg)
 
 

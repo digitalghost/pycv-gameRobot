@@ -36,15 +36,17 @@ print "Excuting rotation for file, Filename is:" + str(sys.argv[1])
 
 cmd = "adb shell dumpsys input | grep 'SurfaceOrientation' | awk '{ print $2 }'"
 result = _run_command(cmd)
-resCode = "0" #0,1,3
+resCode = 0 #0,1,3
 for res in result:
-    resCode = res
+    resCode = int(res.strip("\n"))
+    print resCode
+    break
 
 orgImg = cv2.imread(sys.argv[1],0)
 orgImg2 = orgImg.copy()
-resultImg = _rotateAndScale(orgImg,1.0,90)
-if resCode == "1":
+resultImg = None 
+if resCode == 1:
     resultImg = _rotateAndScale(orgImg,1.0,90)
-elif resCode == "3":
-    resultImg = _rotateAndScale(orgImg,1.0,90)
+elif resCode == 3:
+    resultImg = _rotateAndScale(orgImg,1.0,-90)
 cv2.imwrite(sys.argv[1],resultImg)

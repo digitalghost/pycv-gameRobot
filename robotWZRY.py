@@ -8,6 +8,7 @@ from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice
 supportedDevices = [
     {"pName":"HUAWEI P9","iName":"EVA-AL10___HWEVA"},
     {"pName":"Le Max2","iName":"LeMax2_CN___le_x2"},
+    {"pName":"Xiaomi 5S Plus","iName":"natrium___natrium"},
     {"pName":"CoolPad Dasen F2","iName":"Coolpad8675-W00___Coolpad8675-W00","fixRotation":True},
 ]
 

@@ -8,6 +8,8 @@ from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice
 supportedDevices = [
     {"pName":"HUAWEI P9","iName":"EVA-AL10___HWEVA"},
     {"pName":"Le Max2","iName":"LeMax2_CN___le_x2"},
+    {"pName":"Xiaomi 5S Plus","iName":"natrium___natrium"},
+    {"pName":"CoolPad Dasen F2","iName":"Coolpad8675-W00___Coolpad8675-W00","fixRotation":True},
 ]
 
 autopath = {
@@ -32,7 +34,7 @@ autopath = {
         {"features":["tpl7_1.png","tpl7_2.png"],"touches":["tch7.png"],"method":"proc_autovsnpc_for_tpl7"},
         {"features":["tpl8_1.png"],"touches":["tch8.png"]},
         {"features":["tpl9.png"],"touches":["tch9.png"]},
-        {"features":["tpl10_1.png","tpl10_2.png"],"touches":["tch10.png","tch10_1.png","tch10_2.png"],"method":"proc_autovsnpc_for_tpl10","method_repeats":2},
+        {"features":["tpl10_1.png","tpl10_2.png"],"touches":["tch10.png","tch10_1.png","tch10_2.png"],"method":"proc_autovsnpc_for_tpl10","method_repeats":1},
 
     ]
 }
@@ -139,7 +141,7 @@ def proc_autovsnpc_for_tpl7(data):
     exists,region = _checkTemplateExists(featurePath,LATEST_SCREENSHOT_PATH)
     if exists:
         _leftX = 0
-        _leftY = 150
+        _leftY = 120
         _bottomX = int(region[0])
         _bottomY = int(SCREEN_HEIGHT)
         _tX = random.randint(_leftX,_bottomX)
@@ -168,6 +170,12 @@ def _checkTemplateExists(tplPath,snapshot):
             arr[idx] = int(arr[idx])
         return True,arr
 
+def _fixRotation(snapshotPath):
+    process = subprocess.Popen(['python','./cvFixRotation.py',snapshotPath],stdout=subprocess.PIPE)
+    cmdData = process.communicate()[0]
+    cmdStr = str(cmdData)[:-1]
+    cmdRC = process.returncode
+    return cmdStr
 
 print sys.argv
 if len(sys.argv)<int(2) :
@@ -190,9 +198,12 @@ print "***PHONE INFO*** device width:" + str(SCREEN_WIDTH) + ", Height:" + str(S
 
 # Check if device supported
 _supported = False
+FIX_ROTATION_NEEDED = False
 for _device in supportedDevices:
     if _device["iName"] == DEVICE_FULLNAME:
         _supported = True
+        if _device.has_key("fixRotation"):
+            FIX_ROTATION_NEEDED = _device["fixRotation"]
         break
 if _supported == False:
     print "Your device " + DEVICE_FULLNAME + " not supported in current version, plz contact me"
@@ -212,6 +223,8 @@ while 1:
     startTick = time.time()
     #print "Start write to file :" + LATEST_SCREENSHOT_PATH
     screenShot.writeToFile(LATEST_SCREENSHOT_PATH,'png')
+    if FIX_ROTATION_NEEDED:
+        _fixRotation(LATEST_SCREENSHOT_PATH)
     endTick = time.time()
     #print "Ended write to file, Elapse secs:" + str(endTick-startTick)
     print "***WRITE FILE DONE*** Elapse in secs:" + str(endTick-startTick)

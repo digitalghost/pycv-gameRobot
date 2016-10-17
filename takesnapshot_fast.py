@@ -6,7 +6,6 @@ from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice
 import subprocess
 
 def _run_command(command):
-    #print "Command is:" + command
     p = subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=True)
     print "cmd : " + command
     #return iter(p.stdout.readline, b'')

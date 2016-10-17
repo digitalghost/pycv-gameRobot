@@ -49,4 +49,6 @@ if resCode == 1:
     resultImg = _rotateAndScale(orgImg,1.0,90)
 elif resCode == 3:
     resultImg = _rotateAndScale(orgImg,1.0,-90)
+else:
+    resultImg = orgImg
 cv2.imwrite(sys.argv[1],resultImg)

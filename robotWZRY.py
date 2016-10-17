@@ -162,6 +162,7 @@ def _checkTemplateExists(tplPath,snapshot):
     cmdData = process.communicate()[0]
     cmdStr = str(cmdData)[:-1]
     cmdRC = process.returncode
+    print "!!!!!!!!!!!!"+cmdStr
     if str(cmdStr) == "NULL":
         return False,[]
     else:
@@ -212,22 +213,32 @@ if _supported == False:
 cnt = 0
 LATEST_SCREENSHOT_PATH = "./"
 while 1:
-    startTick = time.time()
-    #print "Start take snapshot for count:" + str(cnt)
-    screenShot = device.takeSnapshot()
-    endTick = time.time()
-    #print "End take snapshot for count:" + str(cnt) + ", Elapse secs:" + str(endTick-startTick)
-    print "***TAKE SNAPSHOT DONE*** Elapse in secs:" + str(endTick-startTick)
-    # Writes the screenshot to a file
+    # Old solution to takesnapshot
+    #startTick = time.time()
+    #screenShot = device.takeSnapshot()
+    #endTick = time.time()
+    #print "***TAKE SNAPSHOT DONE*** Elapse in secs:" + str(endTick-startTick)
+    ## Writes the screenshot to a file
+    #LATEST_SCREENSHOT_PATH = "./snapshots/s" + str(cnt) + ".png"
+    #startTick = time.time()
+    #screenShot.writeToFile(LATEST_SCREENSHOT_PATH,'png')
+    #if FIX_ROTATION_NEEDED:
+    #    _fixRotation(LATEST_SCREENSHOT_PATH)
+    #endTick = time.time()
+    #print "***WRITE FILE DONE*** Elapse in secs:" + str(endTick-startTick)
+
+    # Improved solution to takesnapshot
     LATEST_SCREENSHOT_PATH = "./snapshots/s" + str(cnt) + ".png"
     startTick = time.time()
-    #print "Start write to file :" + LATEST_SCREENSHOT_PATH
-    screenShot.writeToFile(LATEST_SCREENSHOT_PATH,'png')
+    cmd = "adb shell screencap -p | perl -pe 's/\\x0D\\x0A/\\x0A/g' > " + LATEST_SCREENSHOT_PATH
+    process = subprocess.Popen([cmd],stdout=subprocess.PIPE,shell=True)
+    cmdData = process.communicate()[0]
+    cmdStr = str(cmdData)[:-1]
+    cmdRC = process.returncode
     if FIX_ROTATION_NEEDED:
         _fixRotation(LATEST_SCREENSHOT_PATH)
     endTick = time.time()
-    #print "Ended write to file, Elapse secs:" + str(endTick-startTick)
-    print "***WRITE FILE DONE*** Elapse in secs:" + str(endTick-startTick)
+    print "***TAKE SNAPSHOT DONE*** Elapse in secs:" + str(endTick-startTick)
 
     #start loop for autopath
     steps =  autopath[SCENE_NAME]

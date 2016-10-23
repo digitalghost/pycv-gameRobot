@@ -71,7 +71,7 @@ def proc_autovsnpc_for_tpl10(data):
         else:
             _moveYVal = _joyX
     _target = (_joyX+_moveXVal,_joyY+_moveYVal)
-    _rpts = random.randint(3,10)
+    _rpts = random.randint(2,5)
     print "Drag joy %s times, from point: %s,%s  to target point: %s,%s" %(str(_rpts),str(_joyX),str(_joyY),str(_target[0]),str(_target[1]))
     # Check if able to touch the "Attack" button
     touchPath = touches[0]
@@ -291,4 +291,4 @@ while 1:
         cnt = 0
 
     print "===END SCENE LOOP==="
-    MonkeyRunner.sleep(2)
+    MonkeyRunner.sleep(5)

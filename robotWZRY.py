@@ -6,10 +6,9 @@ import random
 from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice
 
 supportedDevices = [
-    {"pName":"HUAWEI P9","iName":"EVA-AL10___HWEVA"},
-    {"pName":"Le Max2","iName":"LeMax2_CN___le_x2"},
-    {"pName":"Xiaomi 5S Plus","iName":"natrium___natrium"},
-    {"pName":"CoolPad Dasen F2","iName":"Coolpad8675-W00___Coolpad8675-W00","fixRotation":True},
+    {"pName":"1080P Phone","resolution":"1920__1080"},
+    {"pName":"720P Phone","resolution":"1280__720"},
+    {"pName":"2K Phone","resolution":"2560__1440"},
 ]
 
 autopath = {
@@ -72,7 +71,7 @@ def proc_autovsnpc_for_tpl10(data):
         else:
             _moveYVal = _joyX
     _target = (_joyX+_moveXVal,_joyY+_moveYVal)
-    _rpts = random.randint(3,10)
+    _rpts = random.randint(2,5)
     print "Drag joy %s times, from point: %s,%s  to target point: %s,%s" %(str(_rpts),str(_joyX),str(_joyY),str(_target[0]),str(_target[1]))
     # Check if able to touch the "Attack" button
     touchPath = touches[0]
@@ -157,7 +156,7 @@ def proc_autovsnpc_for_tpl2(data):
     print "IN Method proc_autovsnpc_for_tpl2,data is: " + str(data)
 
 def _checkTemplateExists(tplPath,snapshot):
-    tplPath = './templates/' + DEVICE_FULLNAME + "/" + SCENE_NAME + '/' + tplPath
+    tplPath = './templates/' + DEVICE_RESID + "/" + SCENE_NAME + '/' + tplPath
     process = subprocess.Popen(['python','./cvTplMatch.py',tplPath,snapshot],stdout=subprocess.PIPE)
     cmdData = process.communicate()[0]
     cmdStr = str(cmdData)[:-1]
@@ -194,20 +193,22 @@ device.wake()
 # Screen properties for the device
 SCREEN_WIDTH = int(device.getProperty("display.width"))
 SCREEN_HEIGHT = int(device.getProperty("display.height"))
-DEVICE_FULLNAME = str(device.getProperty("build.product")) + "___" + str(device.getProperty("build.device"))
-print "***PHONE INFO*** device width:" + str(SCREEN_WIDTH) + ", Height:" + str(SCREEN_HEIGHT) + ", Density:" + str(device.getProperty("display.density") + ", DeviceName:" + DEVICE_FULLNAME)
-
+DEVICE_RESID = str(device.getProperty("display.width")) + "__" + str(device.getProperty("display.height"))
+ANDROID_MAINVERSION = int(device.getProperty("build.version.release")[0])
+print "***PHONE INFO*** device width:" + str(SCREEN_WIDTH) + ", Height:" + str(SCREEN_HEIGHT)+",Density:" + str(device.getProperty("display.density") + ", DeviceResID:" + DEVICE_RESID) + ",Android Version: " + str(ANDROID_MAINVERSION)
 # Check if device supported
 _supported = False
 FIX_ROTATION_NEEDED = False
+if ANDROID_MAINVERSION < 6:
+    FIX_ROTATION_NEEDED = True
 for _device in supportedDevices:
-    if _device["iName"] == DEVICE_FULLNAME:
+    if _device["resolution"] == DEVICE_RESID:
         _supported = True
         if _device.has_key("fixRotation"):
             FIX_ROTATION_NEEDED = _device["fixRotation"]
         break
 if _supported == False:
-    print "Your device " + DEVICE_FULLNAME + " not supported in current version, plz contact me"
+    print "Your device " + DEVICE_RESID + " not supported in current version, plz contact me"
     sys.exit(0)
 
 cnt = 0
@@ -290,4 +291,4 @@ while 1:
         cnt = 0
 
     print "===END SCENE LOOP==="
-    MonkeyRunner.sleep(2)
+    MonkeyRunner.sleep(5)

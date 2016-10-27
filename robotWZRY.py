@@ -2,6 +2,9 @@ import sys
 import subprocess
 import time
 import random
+from java.util.logging import Level, Logger, StreamHandler, SimpleFormatter
+from java.io import ByteArrayOutputStream
+
 # Imports the monkeyrunner modules used by this program
 from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice
 
@@ -187,6 +190,10 @@ SCENE_NAME = sys.argv[1];
 subprocess.call(['./killmonkey.sh'])
 # Connects to the current device, returning a MonkeyDevice object
 device = MonkeyRunner.waitForConnection()
+errors = ByteArrayOutputStream(100)
+logger = Logger.getLogger('com.android.chimpchat.adb.AdbChimpDevice')
+logger.addHandler(StreamHandler(errors, SimpleFormatter()))
+
 print "***CONNECTED TO PHONE***"
 device.wake()
 
@@ -284,6 +291,15 @@ while 1:
                         device.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
                     else:
                         print "---FEATURE FOUNDED, BUT TOUCH %s NOT FOUNDED, CHECK YOUR TEMPLATE CONFIGURATION---" %touch
+            if errors.size() > 0:
+                print "***ERRORS OCCURED*** Try to reset the monkeyrunner connection"
+                # Kill monkey process for stop the exception for socket error
+                subprocess.call(['./killmonkey.sh'])
+                # Connects to the current device, returning a MonkeyDevice object
+                device = MonkeyRunner.waitForConnection()
+                errors = ByteArrayOutputStream(100)
+                logger = Logger.getLogger('com.android.chimpchat.adb.AdbChimpDevice')
+                logger.addHandler(StreamHandler(errors, SimpleFormatter()))
             break
     
     cnt += 1

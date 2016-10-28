@@ -37,7 +37,7 @@ autopath = {
         {"features":["tpl8_1.png"],"touches":["tch8.png"]},
         {"features":["tpl9.png"],"touches":["tch9.png"]},
         {"features":["tpl10_1.png","tpl10_2.png"],"touches":["tch10.png","tch10_1.png","tch10_2.png"],"method":"proc_autovsnpc_for_tpl10","method_repeats":1},
-
+        {"features":["tpl11.png"],"touches":["tch11.png"]},
     ]
 }
 

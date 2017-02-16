@@ -37,16 +37,16 @@ Settings.SCENE_NAME = sceneName
 # Kill monkey process for stop the exception for socket error
 subprocess.call(['./killmonkey.sh'])
 # Connects to the current device, returning a MonkeyDevice object
-device = MonkeyRunner.waitForConnection()
+Settings.DEVICE = MonkeyRunner.waitForConnection()
 print "***CONNECTED TO PHONE***"
-device.wake()
+Settings.DEVICE.wake()
 
 # Screen properties for the device
-SCREEN_WIDTH = int(device.getProperty("display.width"))
-SCREEN_HEIGHT = int(device.getProperty("display.height"))
-ANDROID_MAINVERSION = int(device.getProperty("build.version.release")[0])
-Settings.DEVICE_RESID = str(device.getProperty("display.width")) + "__" + str(device.getProperty("display.height"))
-print "***PHONE INFO*** device width:" + str(SCREEN_WIDTH) + ", Height:" + str(SCREEN_HEIGHT)+",Density:" + str(device.getProperty("display.density") + ", DeviceResID:" + Settings.DEVICE_RESID) + ",Android Version: " + str(ANDROID_MAINVERSION)
+SCREEN_WIDTH = int(Settings.DEVICE.getProperty("display.width"))
+SCREEN_HEIGHT = int(Settings.DEVICE.getProperty("display.height"))
+ANDROID_MAINVERSION = int(Settings.DEVICE.getProperty("build.version.release")[0])
+Settings.DEVICE_RESID = str(Settings.DEVICE.getProperty("display.width")) + "__" + str(Settings.DEVICE.getProperty("display.height"))
+print "***PHONE INFO*** device width:" + str(SCREEN_WIDTH) + ", Height:" + str(SCREEN_HEIGHT)+",Density:" + str(Settings.DEVICE.getProperty("display.density") + ", DeviceResID:" + Settings.DEVICE_RESID) + ",Android Version: " + str(ANDROID_MAINVERSION)
 # Check if device supported
 _supported = False
 if ANDROID_MAINVERSION < 6:
@@ -66,7 +66,7 @@ print "***Sence Paths Length %s" %len(sence.paths)
 if len(sence.paths) >0:
     currentPath = sence.paths[0] 
     while(True): 
-        nextPathId = ToolUtils.executeScenePath(currentPath, device)  
+        nextPathId = ToolUtils.executeScenePath(currentPath, Settings.DEVICE)  
         if nextPathId >= 0:
             foundNextPath = False
             for path in sence.paths:

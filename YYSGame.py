@@ -3,6 +3,7 @@ import Settings
 from Scene import Scene
 from ScenePath import ScenePath
 from ToolUtils import ToolUtils
+from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice
 
 class YYSGame(object):
 	"""阴阳师游戏自动化脚本"""
@@ -112,6 +113,7 @@ class YYSGame(object):
 		path6.features = ["tpl9.png"]
 		path6.touches = ["tch9.png"]
 		path6.nextPathId = 6
+		path6.waitTime = 10
 		path6.needRepeatWhenNotFound = False
 		scene.paths.append(path6)
 
@@ -119,7 +121,7 @@ class YYSGame(object):
 		path7.name = "点击完成(胜利页面)"
 		path7.features = ["tpl8.png"]
 		path7.touches = ["tch8.png"]
-		path7.waitTime = 60
+		path7.waitTime = 30
 		path7.nextPathId = 7
 		scene.paths.append(path7)
 
@@ -134,36 +136,40 @@ class YYSGame(object):
 		path9.name = "点击完成(奖品列表)"
 		path9.features = ["tpl12.png"]
 		path9.touches = ["tch12.png"]
-		path9.nextPathId = 3
+		path9.nextPathId = 9
 		scene.paths.append(path9)
 
 		path9 = ScenePath(9)
 		path9.name = "继续寻找妖怪"
 		path9.features = ["tpl4.png"]
-		path9.waitTime = 15
+		path9.waitTime = 10
 		path9.method = "findYG2Fight"
 		scene.paths.append(path9)
 
 		return scene
 
 	def findYG2Fight(self, scenePath):
+		if Settings.FOUND_BOSS_AND_FIGHTING:
+			fightYGFinish(scenePath)
+			return
 		moveLeftTpl = "tpl4.png"
 		moveRightTpl = "tpl6.png"
 		rightMoveCount = 0
 		movingRight = True
 		featuresFounded = False
 		print "===BEGIN FIND BOSS OR YAOGUAI==="
-		while !featuresFounded:
+		while (not featuresFounded):
 			tplPath = "tpl10.png"
 			print "***FEATURE BOSS MATCHING***........Template Path is %s" %tplPath
 			exists,region = ToolUtils.checkTemplateExists(tplPath,Settings.LATEST_SCREENSHOT_PATH)
 			if exists:
 				print "***BOSS MATCHING SUCCEED***" 
 				featuresFounded = True
+				Settings.FOUND_BOSS_AND_FIGHTING = True
 				touchPath = "tch10.png"
 				print "***TOUCH BOSS MATCHING***........Touch Path is %s" %touchPath
 				centerX,centerY = ToolUtils.getTouchPoint(region)
-				device.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
+				Settings.DEVICE.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
 			else:
 				tplPath = "tpl3.png"
 				print "***FEATURE YAOGUAI MATCHING***........Template Path is %s" %tplPath
@@ -174,7 +180,7 @@ class YYSGame(object):
 					touchPath = "tch3.png"
 					print "***TOUCH YAOGUAI MATCHING***........Touch Path is %s" %touchPath
 					centerX,centerY = ToolUtils.getTouchPoint(region)
-					device.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
+					Settings.DEVICE.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
 			if featuresFounded:
 				scenePath.nextPathId = 6
 				break
@@ -189,9 +195,35 @@ class YYSGame(object):
 						print "!!!FIND YAOGUAI FAILED"
 						break
 					exists,region = ToolUtils.checkTemplateExists(moveLeftTpl,Settings.LATEST_SCREENSHOT_PATH)
-					if exists:
-						print "***TOUCH MOVE***........Touch Path is %s" %moveRightTpl
-						centerX,centerY = ToolUtils.getTouchPoint(region)
-						device.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
-						MonkeyRunner.sleep(5)
-						ToolUtils.takeSnapshot(device)
+				if exists:
+					print "***TOUCH MOVE***........Touch Path is %s" %moveRightTpl
+					centerX,centerY = ToolUtils.getTouchPoint(region)
+					Settings.DEVICE.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
+					MonkeyRunner.sleep(5)
+					ToolUtils.takeSnapshot(Settings.DEVICE)
+
+	def fightYGFinish(scenePath):
+		# Click space and check if the price exist
+		spaceTpl = "tpl4.png"
+		exists,region = ToolUtils.checkTemplateExists(spaceTpl,Settings.LATEST_SCREENSHOT_PATH)
+		while (not exists):
+			MonkeyRunner.sleep(5)
+			ToolUtils.takeSnapshot(Settings.DEVICE)
+			exists,region = ToolUtils.checkTemplateExists(spaceTpl,Settings.LATEST_SCREENSHOT_PATH)
+		centerX,centerY = ToolUtils.getTouchPoint(region)
+		Settings.DEVICE.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
+		MonkeyRunner.sleep(5)
+		ToolUtils.takeSnapshot(Settings.DEVICE)
+		prisetpl = "tpl13.png"
+
+		for x in xrange(1,3):
+			exists,region = ToolUtils.checkTemplateExists(prisetpl,Settings.LATEST_SCREENSHOT_PATH)
+			if exists:
+				centerX,centerY = ToolUtils.getTouchPoint(region)
+				Settings.DEVICE.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
+				MonkeyRunner.sleep(2)
+				Settings.DEVICE.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
+				MonkeyRunner.sleep(2)
+		Settings.DEVICE.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
+		scenePath.nextPathId = 1
+

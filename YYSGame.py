@@ -148,10 +148,36 @@ class YYSGame(object):
 
 		return scene
 
+	@staticmethod	
+	def fightYGFinish(scenePath):
+			# Click space and check if the price exist
+			spaceTpl = "tpl4.png"
+			exists,region = ToolUtils.checkTemplateExists(spaceTpl,Settings.LATEST_SCREENSHOT_PATH)
+			while (not exists):
+				MonkeyRunner.sleep(5)
+				ToolUtils.takeSnapshot(Settings.DEVICE)
+				exists,region = ToolUtils.checkTemplateExists(spaceTpl,Settings.LATEST_SCREENSHOT_PATH)
+			centerX,centerY = ToolUtils.getTouchPoint(region)
+			Settings.DEVICE.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
+			MonkeyRunner.sleep(5)
+			ToolUtils.takeSnapshot(Settings.DEVICE)
+			prisetpl = "tpl13.png"
+
+			for x in xrange(1,4):
+				exists,region = ToolUtils.checkTemplateExists(prisetpl,Settings.LATEST_SCREENSHOT_PATH)
+				if exists:
+					centerX,centerY = ToolUtils.getTouchPoint(region)
+					Settings.DEVICE.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
+					MonkeyRunner.sleep(3)
+					Settings.DEVICE.touch(10,200,MonkeyDevice.DOWN_AND_UP)
+					MonkeyRunner.sleep(4)
+			Settings.DEVICE.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
+			scenePath.nextPathId = 0
+
 	def findYG2Fight(self, scenePath):
 		if Settings.FOUND_BOSS_AND_FIGHTING:
-			fightYGFinish(scenePath)
-			return
+			YYSGame.fightYGFinish(scenePath)
+			return 
 		moveLeftTpl = "tpl4.png"
 		moveRightTpl = "tpl6.png"
 		rightMoveCount = 0
@@ -202,28 +228,4 @@ class YYSGame(object):
 					MonkeyRunner.sleep(5)
 					ToolUtils.takeSnapshot(Settings.DEVICE)
 
-	def fightYGFinish(scenePath):
-		# Click space and check if the price exist
-		spaceTpl = "tpl4.png"
-		exists,region = ToolUtils.checkTemplateExists(spaceTpl,Settings.LATEST_SCREENSHOT_PATH)
-		while (not exists):
-			MonkeyRunner.sleep(5)
-			ToolUtils.takeSnapshot(Settings.DEVICE)
-			exists,region = ToolUtils.checkTemplateExists(spaceTpl,Settings.LATEST_SCREENSHOT_PATH)
-		centerX,centerY = ToolUtils.getTouchPoint(region)
-		Settings.DEVICE.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
-		MonkeyRunner.sleep(5)
-		ToolUtils.takeSnapshot(Settings.DEVICE)
-		prisetpl = "tpl13.png"
-
-		for x in xrange(1,3):
-			exists,region = ToolUtils.checkTemplateExists(prisetpl,Settings.LATEST_SCREENSHOT_PATH)
-			if exists:
-				centerX,centerY = ToolUtils.getTouchPoint(region)
-				Settings.DEVICE.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
-				MonkeyRunner.sleep(2)
-				Settings.DEVICE.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
-				MonkeyRunner.sleep(2)
-		Settings.DEVICE.touch(centerX,centerY,MonkeyDevice.DOWN_AND_UP)
-		scenePath.nextPathId = 1
 
